@@ -1,7 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.recursos_nativos">
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
    <application
-        android:label="recursos_nativos"
+        android:label="iPlace"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
