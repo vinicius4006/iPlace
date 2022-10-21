@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
+import 'package:recursos_nativos/utils/location_util.dart';
+import 'package:recursos_nativos/views/map_screen.dart';
 
 class LocationInput extends StatefulWidget {
-  const LocationInput({super.key});
+  final Function onSelectedPosition;
+  const LocationInput({super.key, required this.onSelectedPosition});
 
   @override
   State<LocationInput> createState() => _LocationInputState();
@@ -9,6 +14,25 @@ class LocationInput extends StatefulWidget {
 
 class _LocationInputState extends State<LocationInput> {
   String? _previewImageUrl;
+
+  Future<void> _getCurrentUserLocation() async {
+    final locData = await Location().getLocation();
+
+    final staticMapImageUrl = LocationUtil.generateLocationPreviewImage(
+        latitude: locData.latitude!, longitude: locData.longitude!);
+
+    setState(() => _previewImageUrl = staticMapImageUrl);
+  }
+
+  Future<void> _selectOnMap() async {
+    final LatLng? selectedPosition = await Navigator.of(context).push(
+        MaterialPageRoute(
+            fullscreenDialog: true, builder: (ctx) => MapScreen()));
+
+    debugPrint("LATITUDE: ${selectedPosition?.latitude}");
+    widget.onSelectedPosition(selectedPosition);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -31,14 +55,14 @@ class _LocationInputState extends State<LocationInput> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             TextButton.icon(
-                onPressed: () {},
+                onPressed: _getCurrentUserLocation,
                 style: TextButton.styleFrom(
                     textStyle:
                         TextStyle(color: Theme.of(context).primaryColor)),
                 icon: const Icon(Icons.location_on),
                 label: const Text('Localização Atual')),
             TextButton.icon(
-                onPressed: () {},
+                onPressed: _selectOnMap,
                 style: TextButton.styleFrom(
                     textStyle:
                         TextStyle(color: Theme.of(context).primaryColor)),

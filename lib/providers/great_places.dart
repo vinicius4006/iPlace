@@ -2,8 +2,10 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:recursos_nativos/models/place.dart';
 import 'package:recursos_nativos/utils/db_util.dart';
+import 'package:recursos_nativos/utils/location_util.dart';
 
 class GreatPlaces with ChangeNotifier {
   List<Place> _items = [];
@@ -14,7 +16,7 @@ class GreatPlaces with ChangeNotifier {
         .map((item) => Place(
             id: item['id'],
             title: item['title'],
-            location: PlaceLocation(latiudade: 0, longitude: 0),
+            location: PlaceLocation(latitude: 0, longitude: 0),
             image: File(item['image'])))
         .toList();
     notifyListeners();
@@ -26,11 +28,15 @@ class GreatPlaces with ChangeNotifier {
 
   Place itemByIndex(int index) => _items[index];
 
-  void addPlace(String title, File image) {
+  Future<void> addPlace(String title, File image, LatLng position) async {
+    String address = await LocationUtil.getAddressFrom(position);
     final newPlace = Place(
         id: Random().nextDouble().toString(),
         title: title,
-        location: PlaceLocation(latiudade: 0, longitude: 0),
+        location: PlaceLocation(
+            latitude: position.latitude,
+            longitude: position.longitude,
+            address: address),
         image: image);
     _items.add(newPlace);
     DbUtil.insert('places', {

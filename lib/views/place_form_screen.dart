@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:recursos_nativos/providers/great_places.dart';
 import 'package:recursos_nativos/widgets/image_input.dart';
@@ -16,15 +17,28 @@ class PlaceFormScreen extends StatefulWidget {
 class _PlaceFormScreenState extends State<PlaceFormScreen> {
   final _titleController = TextEditingController();
   File? _pickedImage;
+  LatLng? _pickedPosition;
 
   void _selectImage(File pickedImage) {
-    _pickedImage = pickedImage;
+    setState(() => _pickedImage = pickedImage);
+  }
+
+  void _selectPosition(LatLng position) {
+    setState(() => _pickedPosition = position);
+  }
+
+  bool _isValidForm() {
+    return _titleController.text.isEmpty ||
+        _pickedImage == null ||
+        _pickedPosition == null;
   }
 
   void _submitForm() {
-    if (_titleController.text.isEmpty || _pickedImage == null) return;
+    if (_isValidForm()) return;
 
-    context.read<GreatPlaces>().addPlace(_titleController.text, _pickedImage!);
+    context
+        .read<GreatPlaces>()
+        .addPlace(_titleController.text, _pickedImage!, _pickedPosition!);
 
     Navigator.pop(context);
   }
@@ -59,9 +73,10 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                         const SizedBox(
                           height: 10,
                         ),
-                        const AspectRatio(
+                        AspectRatio(
                           aspectRatio: 1,
-                          child: LocationInput(),
+                          child: LocationInput(
+                              onSelectedPosition: this._selectPosition),
                         )
                       ],
                     ),
@@ -75,7 +90,7 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       elevation: 0,
                       minimumSize: const Size(50, 50)),
-                  onPressed: _submitForm,
+                  onPressed: !_isValidForm() ? _submitForm : null,
                   icon: const Icon(
                     Icons.add,
                   ),
