@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:recursos_nativos/providers/great_places.dart';
 import 'package:recursos_nativos/utils/app_routes.dart';
+import 'package:recursos_nativos/views/place_detail_screen.dart';
 import 'package:recursos_nativos/views/place_form_screen.dart';
 import 'package:recursos_nativos/views/places_list_screen.dart';
 
@@ -23,7 +24,10 @@ class MyApp extends StatelessWidget {
             colorScheme: themeData.colorScheme
                 .copyWith(primary: Colors.indigo, secondary: Colors.amber)),
         home: const PlacesListScreen(),
-        routes: {AppRoutes.PLACE_FORM: (_) => const PlaceFormScreen()},
+        routes: {
+          AppRoutes.PLACE_FORM: (_) => const PlaceFormScreen(),
+          AppRoutes.PLACE_DETAIL: (_) => PlaceDetailScreen(),
+        },
       ),
     );
   }

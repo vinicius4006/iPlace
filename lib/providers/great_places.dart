@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:recursos_nativos/models/place.dart';
 import 'package:recursos_nativos/utils/db_util.dart';
 import 'package:recursos_nativos/utils/location_util.dart';
@@ -12,19 +14,25 @@ class GreatPlaces with ChangeNotifier {
 
   Future<void> loadPlaces() async {
     final dataList = await DbUtil.getData('places');
-    _items = dataList
-        .map(
-          (item) => Place(
-            id: item['id'],
-            title: item['title'],
-            location: PlaceLocation(
-                latitude: item['latitude'],
-                longitude: item['longitude'],
-                address: item['address']),
-            image: File(item['image']),
-          ),
-        )
-        .toList();
+    String dir = (await getApplicationDocumentsDirectory()).path;
+    _items = (dataList.map(
+      (item) {
+        final imgBytes = base64Decode(item["image"]);
+        var file = File("$dir/" +
+            DateTime.now().millisecondsSinceEpoch.toString() +
+            ".jpg");
+        file.writeAsBytesSync(imgBytes);
+        return Place(
+          id: item['id'],
+          title: item['title'],
+          location: PlaceLocation(
+              latitude: item['latitude'],
+              longitude: item['longitude'],
+              address: item['address']),
+          image: file,
+        );
+      },
+    )).toList();
     notifyListeners();
   }
 
@@ -36,6 +44,8 @@ class GreatPlaces with ChangeNotifier {
 
   Future<void> addPlace(String title, File image, LatLng position) async {
     String address = await LocationUtil.getAddressFrom(position);
+
+    String image64 = base64Encode(await image.readAsBytes());
     final newPlace = Place(
         id: Random().nextDouble().toString(),
         title: title,
@@ -48,7 +58,7 @@ class GreatPlaces with ChangeNotifier {
     DbUtil.insert('places', {
       'id': newPlace.id,
       'title': newPlace.title,
-      'image': newPlace.image.path,
+      'image': image64,
       'latitude': position.latitude,
       'longitude': position.longitude,
       'address': address

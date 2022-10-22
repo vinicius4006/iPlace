@@ -65,6 +65,7 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                             aspectRatio: 5 / 1,
                             child: TextField(
                                 controller: _titleController,
+                                onChanged: (txt) => setState(() {}),
                                 decoration: const InputDecoration(
                                     label: Text('Título')))),
                         ImageInput(

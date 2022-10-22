@@ -24,6 +24,8 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = LatLng(
+        widget.initialLocation.latitude, widget.initialLocation.longitude);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Selecione..."),
@@ -38,17 +40,14 @@ class _MapScreenState extends State<MapScreen> {
       ),
       body: GoogleMap(
         initialCameraPosition: CameraPosition(
-          target: LatLng(widget.initialLocation.latitude,
-              widget.initialLocation.longitude),
+          target: loc,
           zoom: 13,
         ),
         myLocationEnabled: true,
         onTap: widget.isReadOnly ? null : _selectedPosition,
-        markers: _pickedPosition == null
-            ? <Marker>{}
-            : <Marker>{
-                Marker(markerId: MarkerId("p1"), position: _pickedPosition!)
-              },
+        markers: <Marker>{
+          Marker(markerId: MarkerId("p1"), position: _pickedPosition ?? loc)
+        },
       ),
     );
   }
