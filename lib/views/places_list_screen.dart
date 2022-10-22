@@ -41,6 +41,10 @@ class PlacesListScreen extends StatelessWidget {
                                     ),
                                   ),
                                   title: Text(greatPlaces.itemByIndex(i).title),
+                                  subtitle: Text(greatPlaces
+                                      .itemByIndex(i)
+                                      .location
+                                      .address),
                                   onTap: () {},
                                 )),
                   )));
